@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Smart Pantry Manager</string>
+
+    <!-- Measurement units available when adding a pantry item -->
+    <string-array name="unit_options">
+        <item>Select unit</item>
+        <item>pieces</item>
+        <item>grams</item>
+        <item>kilograms</item>
+        <item>millilitres</item>
+        <item>litres</item>
+        <item>cups</item>
+        <item>tablespoons</item>
+        <item>teaspoons</item>
+    </string-array>
+</resources>
