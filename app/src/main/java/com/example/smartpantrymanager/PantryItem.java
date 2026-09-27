@@ -1,5 +1,7 @@
 package com.example.smartpantrymanager;
 
+import android.database.Cursor;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -26,6 +28,25 @@ public class PantryItem {
         this.quantity = quantity;
         this.unit = unit;
         this.expiryDate = expiryDate;
+    }
+
+    /**
+     * Builds a PantryItem from the Cursor's current row, so every screen
+     * reads the pantry table the same way.
+     */
+    public static PantryItem fromCursor(Cursor cursor) {
+        int id = cursor.getInt(
+                cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_ID));
+        String name = cursor.getString(
+                cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_NAME));
+        double quantity = cursor.getDouble(
+                cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_QUANTITY));
+        String unit = cursor.getString(
+                cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_UNIT));
+        String expiryDate = cursor.getString(
+                cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_EXPIRY));
+
+        return new PantryItem(id, name, quantity, unit, expiryDate);
     }
 
     public int getId() {
