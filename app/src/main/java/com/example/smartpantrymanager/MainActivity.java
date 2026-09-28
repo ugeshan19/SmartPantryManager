@@ -3,11 +3,14 @@ package com.example.smartpantrymanager;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Use our Toolbar as the app bar so it can show the overflow menu.
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         databaseHelper = new DatabaseHelper(this);
 
         recyclerPantry = findViewById(R.id.recyclerPantry);
@@ -47,10 +54,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // Suggested Recipes button will be connected in a later part.
-        btnSuggestedRecipes.setOnClickListener(v -> {
-            // TODO: open SuggestedRecipesActivity
-        });
+        // Open the Suggested Recipes screen, which runs the strict matching.
+        btnSuggestedRecipes.setOnClickListener(v -> openSuggestedRecipes());
 
         loadPantryItems();
     }
@@ -64,6 +69,39 @@ public class MainActivity extends AppCompatActivity {
         loadPantryItems();
     }
 
+    // ------------------------------------------------------------------
+    // TOOLBAR MENU (navigation)
+    // ------------------------------------------------------------------
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Build the overflow menu from res/menu/main_menu.xml.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_suggested) {
+            openSuggestedRecipes();
+            return true;
+        } else if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void openSuggestedRecipes() {
+        startActivity(new Intent(this, SuggestedRecipesActivity.class));
+    }
+
+    // ------------------------------------------------------------------
+    // PANTRY LIST
+    // ------------------------------------------------------------------
+
     /**
      * Reads every pantry row from SQLite and shows it in the RecyclerView.
      */
@@ -74,18 +112,8 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = databaseHelper.getAllPantryItems();
 
         while (cursor.moveToNext()) {
-            int id = cursor.getInt(
-                    cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_ID));
-            String name = cursor.getString(
-                    cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_NAME));
-            double quantity = cursor.getDouble(
-                    cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_QUANTITY));
-            String unit = cursor.getString(
-                    cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_UNIT));
-            String expiryDate = cursor.getString(
-                    cursor.getColumnIndexOrThrow(DatabaseHelper.COL_PANTRY_EXPIRY));
-
-            pantryItems.add(new PantryItem(id, name, quantity, unit, expiryDate));
+            // PantryItem.fromCursor reads one database row into an object.
+            pantryItems.add(PantryItem.fromCursor(cursor));
         }
 
         // Always close the Cursor after reading the database.
