@@ -62,10 +62,31 @@ public class AddIngredientActivity extends AppCompatActivity {
         if (intent.hasExtra(EXTRA_ITEM_ID)) {
             editItemId = intent.getIntExtra(EXTRA_ITEM_ID, -1);
             fillFormForEditing(intent);
+        } else {
+            // Add mode: pre-select the unit chosen on the Settings screen.
+            applyDefaultUnit();
         }
 
         btnSaveIngredient.setOnClickListener(v -> saveIngredient());
         btnCancel.setOnClickListener(v -> finish());
+    }
+
+    /**
+     * Selects the user's default unit (from Settings) in the spinner.
+     * Does nothing if no default unit has been chosen.
+     */
+    private void applyDefaultUnit() {
+        String defaultUnit = AppSettings.getDefaultUnit(this);
+        if (defaultUnit.isEmpty()) {
+            return;
+        }
+        for (int i = 0; i < spinnerUnit.getCount(); i++) {
+            if (spinnerUnit.getItemAtPosition(i).toString()
+                    .equalsIgnoreCase(defaultUnit)) {
+                spinnerUnit.setSelection(i);
+                break;
+            }
+        }
     }
 
     /**
