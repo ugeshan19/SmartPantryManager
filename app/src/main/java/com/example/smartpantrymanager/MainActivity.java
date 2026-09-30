@@ -20,17 +20,16 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Database helper used to access the SQLite database.
+    // Database helper used to access the SQLite database
     private DatabaseHelper databaseHelper;
 
-    // RecyclerView used to display the user's pantry items.
+    // RecyclerView used to display the user's pantry items
     private RecyclerView recyclerPantry;
 
-    // Buttons used to navigate to other screens.
     private Button btnAddIngredient;
     private Button btnSuggestedRecipes;
 
-    // Banner warning about items that expire soon.
+    // Banner warning about items that expire soon
     private TextView tvExpiryBanner;
 
     @Override
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Use our Toolbar as the app bar so it can show the overflow menu.
+        // To display the overflow menu, use our Toolbar as the app bar
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -51,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerPantry.setLayoutManager(new LinearLayoutManager(this));
 
-        // Open the Add Ingredient screen (no extras = "add" mode).
         btnAddIngredient.setOnClickListener(v -> {
             Intent intent = new Intent(
                     MainActivity.this,
@@ -63,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         // Open the Suggested Recipes screen, which runs the strict matching.
         btnSuggestedRecipes.setOnClickListener(v -> openSuggestedRecipes());
 
-        // Tapping the banner jumps to recipes that can use those ingredients.
+        // Tap the banner jumps to recipes that can use those ingredients.
         tvExpiryBanner.setOnClickListener(v -> openSuggestedRecipes());
 
         loadPantryItems();
@@ -73,18 +71,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Reload the pantry whenever the user returns to this screen so
-        // added / edited items and changed settings appear immediately.
         loadPantryItems();
     }
 
-    // ------------------------------------------------------------------
-    // TOOLBAR MENU (navigation)
-    // ------------------------------------------------------------------
-
+    // Toolbar menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Build the overflow menu from res/menu/main_menu.xml.
+
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
@@ -107,10 +100,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, SuggestedRecipesActivity.class));
     }
 
-    // ------------------------------------------------------------------
     // PANTRY LIST
-    // ------------------------------------------------------------------
-
     /**
      * Reads every pantry row from SQLite and shows it in the RecyclerView.
      */
@@ -121,11 +111,9 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = databaseHelper.getAllPantryItems();
 
         while (cursor.moveToNext()) {
-            // PantryItem.fromCursor reads one database row into an object.
             pantryItems.add(PantryItem.fromCursor(cursor));
         }
 
-        // Always close the Cursor after reading the database.
         cursor.close();
 
         // Read the alert setting fresh each time (it may have just changed).
